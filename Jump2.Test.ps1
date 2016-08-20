@@ -1,7 +1,7 @@
 ﻿Import-Module Pester
-Import-Module Jump2 -Force -Prefix sut
+Import-Module $PSScriptRoot\Jump2.psm1 -Force -Prefix sut
 
-Describe "Set-Jump" {
+Describe "Set-Jump cmdlet" {
     
     BeforeEach {
         Clear-sutJumps
@@ -22,31 +22,53 @@ Describe "Set-Jump" {
         $content = Get-Content $PSScriptRoot/Jumps/$env:ComputerName.json | ConvertFrom-Json
         $content.zumsel | Should Be "c:\zumsel"
     }
+}
+
+Describe "Get-Jump cmdlet" {
+    
+    BeforeEach {
+        Clear-sutJumps
+        Set-sutJump -Destination "c:\zumsel"           
+    }
 
     It "Get-jump returns a directory by its name" {
-        Set-sutJump -Destination "c:\zumsel"           
+        
         (Get-sutJump zumsel).Destination | Should Be "c:\zumsel"
     }
 
     It "Get-jump returns a list of known jump destinations" {
-        Set-sutJump -Destination "c:\zumsel"           
         $list = Get-sutJump
         $list.Length  | Should Be 1
         $list[0].Name | Should Be "zumsel"
         $list[0].Destination | Should Be "c:\zumsel"
     }
+}
+
+Describe "Remove-Jump cmdlet" {
+
+    BeforeEach {
+        Clear-sutJumps
+        Set-sutJump -Destination "c:\zumsel"           
+    }
 
     It "Remove-jump deletes an alias and its destination from the repository" {
-        Set-sutJump -Destination "c:\zumsel"           
         Remove-sutJump "zumsel"
         Get-sutJump zumsel | Should Be $null
+    }
+}
+
+Describe "Invoke-Jump cmdlet" {
+
+    BeforeEach {
+        Clear-sutJumps
+        mkdir TestDrive:\dest -ErrorAction SilentlyContinue
+        Set-sutJump -Destination "TestDrive:\dest"           
     }
 
     It "Invoke-Jump changes the location to the destination of the named jump" {
         Push-Location
-        Set-sutJump -Destination C:\tmp
-        Invoke-sutJump tmp
-        (Get-Location).Path | Should Be c:\tmp
+        Invoke-sutJump dest
+        (Get-Location).Path | Should Be TestDrive:\dest
         Pop-Location
     }
 
@@ -54,8 +76,7 @@ Describe "Set-Jump" {
         $currentLocation = Get-Item $PWD
         Push-Location
         try {
-            Set-sutJump -Destination C:\tmp
-            Invoke-sutJump tmp
+            Invoke-sutJump dest
             Invoke-sutJump back
             Get-Location | Should Be $currentLocation.FullName
         } finally {
@@ -67,8 +88,7 @@ Describe "Set-Jump" {
         $currentLocation = Get-Item $PWD
         Push-Location
         try {
-            Set-sutJump -Destination C:\tmp
-            Invoke-sutJump tmp
+            Invoke-sutJump dest
             Invoke-sutJump
             Get-Location | Should Be $currentLocation.FullName
         } finally {
