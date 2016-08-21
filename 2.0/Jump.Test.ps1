@@ -1,5 +1,5 @@
 ﻿Import-Module Pester
-Import-Module $PSScriptRoot\Jump2.psm1 -Force -Prefix sut
+Import-Module $PSScriptRoot\Jump.psm1 -Force -Prefix sut
 
 Describe "Set-Jump cmdlet" {
     
