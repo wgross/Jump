@@ -113,6 +113,7 @@ function Get-Jump {
     #>
     [CmdletBinding(DefaultParameterSetName="asList")]
     param(
+        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete) }})]
         [Parameter(Position=0,ParameterSetName="byName")]
         [string]$Name
     )
@@ -138,8 +139,9 @@ function Get-Jump {
 function Remove-Jump {
     [CmdletBinding()]
     param(
+        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete) }})]
         [Parameter(Mandatory)]
-        $Name
+        [string]$Name
     )
     process {
         [JumpRepository]::Default.Remove($Name)
@@ -160,7 +162,7 @@ function Invoke-Jump {
     param(
         [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete) }})]
         [Parameter(ValueFromPipeline,Position=0)]
-        $Name    
+        [string]$Name    
     )
     process {
 
