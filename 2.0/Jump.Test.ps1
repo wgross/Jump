@@ -96,3 +96,15 @@ Describe "Invoke-Jump cmdlet" {
         }
     }
 }
+
+Describe "Import-V1Jump cmdlet" {
+    BeforeAll {
+        mkdir TestDrive:\Jumps|Out-Null
+        "c:\testImport"|Out-File TestDrive:\Jumps\aJump
+    }
+
+    It "Creates a new jump in V2 data from V1 jump definition" {
+        Import-sutV1Jump -Directory TestDrive:\Jumps
+        (Get-sutJump aJump).Destination | Should Be "c:\testImport"
+    }
+}

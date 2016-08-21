@@ -82,7 +82,6 @@ function Set-Jump {
     .SYNOPSIS
 	    Creates or changes a jump alias for the specified directory.
     .DESCRIPTION
-	    Creates or changes a jump alias for the specified directory.
 	    Aliases are stored in the modules directory in subdirectory Jumps\$Env:COMPUTERNAME
 	    if no name is specified the base name of the path leaf is taken as an alias
     .PARAMETER Name
@@ -106,6 +105,12 @@ function Set-Jump {
 }
 
 function Get-Jump {
+    <#
+    .SYNOPSIS
+	    Get specified jump adresses stored or all jumps adresses if the name isn't found    
+    .PARAMETER Name
+        Name of the created or changed jump destination
+    #>
     [CmdletBinding(DefaultParameterSetName="asList")]
     param(
         [Parameter(Position=0,ParameterSetName="byName")]
@@ -143,9 +148,17 @@ function Remove-Jump {
 }
 
 function Invoke-Jump {
+    <#
+    .SYNOPSIS
+	    Jumps to the specifed location.
+    .DESCRIPTION
+        Destination 'back' allows to jump to the position before the last jump
+    .PARAMETER name
+        Name of the jump destination. 
+    #>
     [CmdletBinding()]
     param(
-        [ArgumentCompleter({ $wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete) }})]
+        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete) }})]
         [Parameter(ValueFromPipeline,Position=0)]
         $Name    
     )
@@ -164,5 +177,23 @@ function Invoke-Jump {
         
             Set-Location $destination
         }
+    }
+}
+
+function Import-V1Jump {
+    param(
+        [ValidateScript({Test-Path $_ -PathType Container })]
+        [Parameter(Mandatory)]
+        $Directory
+    )
+    process {
+        Get-ChildItem -Path $Directory -File -Recurse | ForEach-Object {
+            # get the file name as jump name
+            $fileName = $_.BaseName
+            Get-Content -Path $_.FullName -TotalCount 1 | ForEach-Object {
+                # from each file take the first and only line
+                [JumpRepository]::Default.Set($fileName, $_)
+            }
+        } 
     }
 }
