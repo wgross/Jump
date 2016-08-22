@@ -182,7 +182,7 @@ function Invoke-Jump {
         if($Global:defaultJumpRepository.TryGet($Name,[ref]$destination)) {
 
             # Create a 'back' jump for the current directory before jumping 
-            $Global:defaultJumpRepository.Set("back",$PWD)
+            $Global:defaultJumpRepository.Set("back",$PWD.Path)
         
             Set-Location $destination
         }
