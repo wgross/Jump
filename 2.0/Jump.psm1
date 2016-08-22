@@ -1,14 +1,13 @@
 ﻿if(!(Test-Path $PSScriptRoot\Jumps)) {
     mkdir $PSScriptRoot\Jumps
 }
-Write-Host "in Dev"
 
-$defaultPath = "$PSScriptRoot\Jumps\$Env:COMPUTERNAME.json"
+#region Classes 
 
 class JumpRepository {
     [string]$Path
     
-    static [JumpRepository] $Default = [JumpRepository]::new($defaultPath)
+    #static [JumpRepository] $Default = [JumpRepository]::new($defaultPath)
 
     [hashtable]$Jumps = @{}
 
@@ -74,8 +73,13 @@ class Jump {
     }
 }
 
+#endregion 
+
+$Script:defaultPath = "$PSScriptRoot\Jumps\$Env:COMPUTERNAME.json"
+$Global:defaultJumpRepository = [JumpRepository]::new($Script:defaultPath)
+
 function Clear-Jumps {
-    [JumpRepository]::Default.Clear()
+    $Global:defaultJumpRepository.Clear()
 }
 
 function Set-Jump {
@@ -103,7 +107,7 @@ function Set-Jump {
         if([string]::IsNullOrEmpty($Name)) {
             $Name = Split-Path $Destination -Leaf
         }
-        [JumpRepository]::Default.Set($Name,$Destination)
+        $Global:defaultJumpRepository.Set($Name,$Destination)
     }
 }
 
@@ -124,12 +128,12 @@ function Get-Jump {
         switch($PSCmdlet.ParameterSetName) {
             "byName" {
                 $destination = $null
-                if([JumpRepository]::Default.TryGet($Name,[ref]$destination)) {
+                if($Global:defaultJumpRepository.TryGet($Name,[ref]$destination)) {
                     [Jump]::new($Name, $destination)
                 }
             }
             "asList" {
-                $jumps = [JumpRepository]::Default.GetAll()
+                $jumps = $Global:defaultJumpRepository.GetAll()
                 $jumps.Keys.ForEach({[Jump]::new($_, $jumps[$_])})
                 #$jumps.Keys | ForEach-Object {
                 #    [Jump]::new($_, $jumps[$_])
@@ -147,7 +151,7 @@ function Remove-Jump {
         [string]$Name
     )
     process {
-        [JumpRepository]::Default.Remove($Name)
+        $Global:defaultJumpRepository.Remove($Name)
     }
 
 }
@@ -175,10 +179,10 @@ function Invoke-Jump {
         }
 
         $destination = $null
-        if([JumpRepository]::Default.TryGet($Name,[ref]$destination)) {
+        if($Global:defaultJumpRepository.TryGet($Name,[ref]$destination)) {
 
             # Create a 'back' jump for the current directory before jumping 
-            [JumpRepository]::Default.Set("back",$PWD)
+            $Global:defaultJumpRepository.Set("back",$PWD)
         
             Set-Location $destination
         }
@@ -197,7 +201,7 @@ function Import-V1Jump {
             $fileName = $_.BaseName
             Get-Content -Path $_.FullName -TotalCount 1 | ForEach-Object {
                 # from each file take the first and only line
-                [JumpRepository]::Default.Set($fileName, $_)
+                $Global:defaultJumpRepository.Set($fileName, $_)
             }
         } 
     }
