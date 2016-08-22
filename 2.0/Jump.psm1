@@ -1,6 +1,7 @@
 ﻿if(!(Test-Path $PSScriptRoot\Jumps)) {
     mkdir $PSScriptRoot\Jumps
 }
+Write-Host "in Dev"
 
 $defaultPath = "$PSScriptRoot\Jumps\$Env:COMPUTERNAME.json"
 
@@ -85,13 +86,15 @@ function Set-Jump {
 	    Aliases are stored in the modules directory in subdirectory Jumps\$Env:COMPUTERNAME
 	    if no name is specified the base name of the path leaf is taken as an alias
     .PARAMETER Name
-        Name of the created or changed jump destination
+        Name of the created or changed jump destination. If no name is given the base name of the 
+        specified destination is taken as the name.
     .PARAMETER Destination
-        path to the jump destination, may be an absolute path or a relative path
+        path to the jump destination, may be an absolute path or a relative path. 
+        If no destination is specified the current working directory is assumed as destination.
     #>
     param(
         [Parameter(Position=0)]
-        [string]$Destination,
+        $Destination = $PWD,
         
         [Parameter(Position=1)]
         [string]$Name
