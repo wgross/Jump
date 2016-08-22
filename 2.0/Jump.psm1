@@ -1,7 +1,6 @@
 ﻿if(!(Test-Path $PSScriptRoot\Jumps)) {
     mkdir $PSScriptRoot\Jumps
 }
-Write-Host "in Dev"
 
 $defaultPath = "$PSScriptRoot\Jumps\$Env:COMPUTERNAME.json"
 
