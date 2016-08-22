@@ -22,6 +22,17 @@ Describe "Set-Jump cmdlet" {
         $content = Get-Content $PSScriptRoot/Jumps/$env:ComputerName.json | ConvertFrom-Json
         $content.zumsel | Should Be "c:\zumsel"
     }
+
+    It "Set-Jump without a destination take the base name of the current working directory" {
+        try {
+            mkdir TestDrive:\nodestination
+            Set-Location TestDrive:\noDestination
+            Set-sutJump
+            (Get-sutJump noDestination).Destination | Should Be "TestDrive:\noDestination"
+        } finally {
+            Set-Location $PSScriptRoot
+        }
+    }
 }
 
 Describe "Get-Jump cmdlet" {
