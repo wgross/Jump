@@ -1,9 +1,10 @@
-﻿if(!(Test-Path $PSScriptRoot\Jumps)) {
-    mkdir $PSScriptRoot\Jumps
-}
-Write-Host "in Dev"
+﻿$jumpDirectory = Join-Path $PSScriptRoot "Jumps"
 
-$defaultPath = "$PSScriptRoot\Jumps\$Env:COMPUTERNAME.json"
+if(!(Test-Path $jumpDirectory)) {
+    mkdir $jumpDirectory
+}
+
+$defaultPath = Join-Path $jumpDirectory "$Env:COMPUTERNAME.json"
 
 class JumpRepository {
     [string]$Path
