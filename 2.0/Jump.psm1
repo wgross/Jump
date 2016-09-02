@@ -7,6 +7,7 @@ if(!(Test-Path $jumpDirectory)) {
 $defaultPath = Join-Path $jumpDirectory "$Env:COMPUTERNAME.json"
 
 class JumpRepository {
+
     [string]$Path
     
     static [JumpRepository] $Default = [JumpRepository]::new($defaultPath)
@@ -95,10 +96,10 @@ function Set-Jump {
     #>
     param(
         [Parameter(Position=0)]
-        $Destination = $PWD,
-        
+        [string]$Name,
+
         [Parameter(Position=1)]
-        [string]$Name
+        $Destination = $PWD
     )
     process {
         if([string]::IsNullOrEmpty($Name)) {
