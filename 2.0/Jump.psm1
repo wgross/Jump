@@ -4,7 +4,7 @@ if(!(Test-Path $jumpDirectory)) {
     mkdir $jumpDirectory
 }
 
-$defaultPath = Join-Path $jumpDirectory "$Env:COMPUTERNAME.json"
+$defaultPath = Join-Path $jumpDirectory "$([System.Environment]::MachineName).json"
 
 class JumpRepository {
 
