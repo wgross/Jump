@@ -4,7 +4,7 @@ if(!(Test-Path $jumpDirectory)) {
     mkdir $jumpDirectory
 }
 
-$defaultPath = Join-Path $jumpDirectory "$Env:COMPUTERNAME.json"
+$defaultPath = Join-Path $jumpDirectory "$([System.Environment]::MachineName).json"
 
 class JumpRepository {
 
@@ -118,7 +118,7 @@ function Get-Jump {
     #>
     [CmdletBinding(DefaultParameterSetName="asList")]
     param(
-        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete) }})]
+        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete, [System.StringComparison]::OrdinalIgnoreCase) }})]
         [Parameter(Position=0,ParameterSetName="byName")]
         [string]$Name
     )
@@ -144,7 +144,7 @@ function Get-Jump {
 function Remove-Jump {
     [CmdletBinding()]
     param(
-        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete) }})]
+        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete, [System.StringComparison]::OrdinalIgnoreCase) }})]
         [Parameter(Mandatory)]
         [string]$Name
     )
@@ -165,7 +165,7 @@ function Invoke-Jump {
     #>
     [CmdletBinding()]
     param(
-        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete) }})]
+        [ArgumentCompleter({$wordToComplete = $args[2]; Get-Jump | Select-Object -ExpandProperty Name | Where-Object { $_.StartsWith($wordToComplete, [System.StringComparison]::OrdinalIgnoreCase) }})]
         [Parameter(ValueFromPipeline,Position=0)]
         [string]$Name    
     )
