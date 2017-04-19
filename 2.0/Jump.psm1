@@ -204,3 +204,7 @@ function Import-V1Jump {
         } 
     }
 }
+
+function JUMPS: {
+    Set-Location -Path $jumpDirectory
+}
